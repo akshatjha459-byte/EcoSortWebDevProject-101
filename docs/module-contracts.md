@@ -1,19 +1,157 @@
 # EcoSort 2.0 — Module Contracts
 
-> Status: DESIGN PHASE
+> Status: ACCEPTED BASELINE
 
-This file is the canonical registry of cross-module contracts.
+This is the canonical registry of contracts that cross module boundaries. Implementation AIs must read this file before changing a module.
 
 ## Contract Rules
 
-1. A verified module contract is stable by default.
-2. Later modules must consume earlier contracts rather than silently redefining them.
-3. Breaking changes require an explicit architectural decision and regression verification.
-4. Implementation details that are private to a module do not belong here unless another module depends on them.
-5. APIs, DTOs, domain contracts, repository abstractions, AI inference contracts, and external-service boundaries belong here when they cross module boundaries.
+1. A verified contract is stable by default.
+2. Later modules consume earlier contracts; they do not silently redefine them.
+3. Breaking changes require an explicit architecture decision and full regression verification.
+4. Private implementation details stay in the module README/source unless another module depends on them.
+5. Cross-module APIs, DTOs, domain objects, repository interfaces, AI interfaces, persistence rules, and external-service boundaries belong here.
+6. If an implementation discovers a contradiction, stop and report it rather than guessing.
 
-## Modules
+## Module Dependency Direction
 
-No module contracts have been accepted yet.
+```text
+M1 Foundation
+  ↓
+M2 Identity & Access
+  ↓
+M3 Waste Domain & Persistence
+  ↓
+M4 Classification Application
+  ↓
+M5 AI Inference Integration
+  ↓
+M6 Disposal Recommendations
+  ↓
+M7 History & Reports
+  ↓
+M8 Dashboard & Analytics
+  ↓
+M9 Web Application Integration
+  ↓
+M10 Production Readiness
+```
 
-The module sequence and contracts will be added after the EcoSort 2.0 functional scope and architecture are finalized.
+A module may use stable infrastructure from earlier modules. It must not depend on an unfinished future module.
+
+## Contract Statuses
+
+- `PROPOSED` — identified but not yet implemented/verified.
+- `ACCEPTED` — agreed architectural/interface contract.
+- `VERIFIED` — exercised by tests and preserved by regression.
+- `DEPRECATED` — retained only for compatibility and scheduled for removal.
+
+## M1 — Backend Foundation
+
+**Status:** ACCEPTED
+
+Owns the Spring Boot/Maven foundation, application configuration conventions, environment configuration, health baseline, common error/response conventions where established, and test bootstrap.
+
+**Cross-module contract:** later modules inherit the project/package/build/test conventions and common infrastructure established by M1.
+
+**Must not own:** business-specific waste, authentication, AI, recommendation, reporting, or frontend functionality.
+
+## M2 — Identity & Access
+
+**Status:** ACCEPTED
+
+Owns user identity, authentication, authorization, protected-resource rules, and user identity propagation into application services.
+
+**Cross-module contract:** downstream services can rely on an authenticated user identity and authorization boundary without implementing authentication themselves.
+
+**Compatibility requirement:** user-owned resources must be scoped to the authenticated user.
+
+## M3 — Waste Domain & Persistence
+
+**Status:** ACCEPTED
+
+Owns the core waste/classification persistence model and MongoDB repository boundary.
+
+**Cross-module contract:** downstream modules consume domain/application models and repository/service interfaces rather than raw MongoDB queries.
+
+The exact document fields, identifiers, indexes, validation rules, and repository methods are recorded here when finalized during M3.
+
+## M4 — Classification Application
+
+**Status:** ACCEPTED
+
+Owns the classification use case, input validation, orchestration, classification result contract, and the stable inference interface consumed by the application.
+
+**Cross-module contract:** the application asks for classification through the accepted inference abstraction. Controllers and persistence do not depend on provider-specific AI APIs.
+
+The concrete provider is intentionally owned by M5.
+
+## M5 — AI Inference Integration
+
+**Status:** ACCEPTED
+
+Owns the concrete AI/model/provider client and mapping between provider responses and the M4 inference contract.
+
+**Cross-module contract:** provider-specific details remain behind the M4 interface. Provider failures, timeouts, malformed responses, and invalid predictions are normalized according to the accepted classification error contract.
+
+## M6 — Disposal Recommendations
+
+**Status:** ACCEPTED
+
+Owns disposal/recycling recommendation rules derived from verified classification results.
+
+**Cross-module contract:** recommendation logic consumes classification/domain information and returns a stable recommendation model. It does not perform AI inference or duplicate authentication.
+
+## M7 — History & Reports
+
+**Status:** ACCEPTED
+
+Owns user history retrieval, filtering, report-oriented queries, and required aggregations over persisted waste records.
+
+**Cross-module contract:** history/report APIs use persisted application data and respect the M2 user authorization boundary.
+
+History must not re-run AI inference simply to reconstruct an existing result.
+
+## M8 — Dashboard & Analytics
+
+**Status:** ACCEPTED
+
+Owns dashboard metrics and analytics derived from verified persisted records/report services.
+
+**Cross-module contract:** dashboard metrics are derived from application data and preserve user scoping. Analytics must not invent values or call the AI provider as a substitute for stored data.
+
+## M9 — Web Application Integration
+
+**Status:** ACCEPTED
+
+Owns the React + TypeScript UI and integration with the verified backend APIs.
+
+**Cross-module contract:** the frontend consumes backend API contracts and handles loading, success, validation, authentication, and error states without duplicating backend business rules.
+
+The frontend must not connect directly to MongoDB.
+
+## M10 — Production Readiness
+
+**Status:** ACCEPTED
+
+Owns end-to-end verification, deployment configuration, production security hardening, observability, operational configuration, and final regression.
+
+**Cross-module contract:** M10 may harden or operationalize existing behavior but must not silently change functional contracts.
+
+## Change Control
+
+If any module needs to change a verified contract:
+
+1. Identify the existing contract.
+2. Explain why it is insufficient.
+3. Identify affected modules and tests.
+4. Propose the new contract.
+5. Update this registry and `docs/Architecture.md`.
+6. Obtain approval when working interactively.
+7. Implement the change.
+8. Run focused tests and the full regression suite.
+9. Record the decision and checkpoint in `docs/PROGRESS.md`.
+
+## Final Rule
+
+> A later module must preserve earlier verified contracts unless an explicit architectural change says otherwise.
