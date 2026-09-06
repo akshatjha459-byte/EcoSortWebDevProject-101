@@ -1,41 +1,93 @@
 # EcoSort 2.0 — Progress
 
+> This file is the persistent handoff state. It must reflect repository reality, not chat history.
+
 ## Project Status
 
-**Phase:** Design / Repository Foundation
+**Phase:** Repository Foundation / Module Skeleton
+
+**Overall Status:** NOT STARTED
 
 ## Current State
 
-- Previous Lovable/Supabase EcoSort implementation is being removed from the new project repository.
-- Engineering workflow has been established in `docs/PROJECT_WORKFLOW.md`.
-- Architecture baseline has been established in `docs/Architecture.md`.
-- Cross-module contract registry has been established in `docs/module-contracts.md`.
-- Java + Spring Boot and MongoDB are the current accepted technology direction.
-- Module sequence has not yet been finalized.
+- EcoSort 2.0 is a clean rebuild of the previous Lovable/Supabase prototype.
+- Backend direction: Java + Spring Boot + Maven.
+- Database: MongoDB / MongoDB Atlas.
+- Frontend: React + TypeScript.
+- AI: isolated behind a stable inference boundary.
+- Final module sequence has been accepted.
+- All ten module directories are established up front with module READMEs and test placeholders.
+- Implementation has not started.
 
-## Modules
+## Canonical Project Documents
+
+- `docs/Architecture.md` — accepted system architecture and module sequence.
+- `docs/module-contracts.md` — accepted cross-module contract registry.
+- `docs/PROGRESS.md` — current implementation/handoff state.
+
+The personal workflow document is intentionally **not stored in the repository**.
+
+## Module Status
 
 | Module | Name | Status |
 |---|---|---|
-| M1+ | TBD | NOT STARTED |
+| M1 | Backend Foundation | NOT STARTED |
+| M2 | Identity & Access | NOT STARTED |
+| M3 | Waste Domain & Persistence | NOT STARTED |
+| M4 | Classification Application | NOT STARTED |
+| M5 | AI Inference Integration | NOT STARTED |
+| M6 | Disposal Recommendations | NOT STARTED |
+| M7 | History & Reports | NOT STARTED |
+| M8 | Dashboard & Analytics | NOT STARTED |
+| M9 | Web Application Integration | NOT STARTED |
+| M10 | Production Readiness | NOT STARTED |
 
-## Verification
+## Module Workflow
 
-- Repository workflow documentation: COMPLETE
-- Architecture baseline: COMPLETE
-- Module contract registry: COMPLETE
-- Application implementation: NOT STARTED
-- Automated tests: NOT STARTED
+For every module:
+
+1. Read the canonical architecture, contracts, progress, module README, source, and relevant tests.
+2. Plan only the current module.
+3. Implement only the current module.
+4. Run focused module tests.
+5. Run the complete regression suite.
+6. Inspect `git status` and `git diff`.
+7. Update module README and canonical docs as required.
+8. Create a focused checkpoint commit.
+9. Only then move to the next module.
+
+## Verification Standard
+
+A module is `VERIFIED` only when:
+
+- implementation is complete;
+- focused tests pass;
+- full regression tests pass;
+- contracts are preserved;
+- no secrets are committed;
+- diff has been reviewed;
+- documentation reflects verified reality;
+- and the checkpoint is recorded.
 
 ## Important Decisions
 
-- EcoSort 2.0 is a clean implementation and will not depend on the old Lovable/Supabase codebase.
-- The old EcoSort project may be used as a product/reference specification where useful.
-- Backend direction: Java + Spring Boot.
-- Database direction: MongoDB.
-- Frontend direction: React + TypeScript.
-- AI functionality will be isolated behind an explicit service/interface boundary.
+- The previous Lovable/Supabase project is reference-only.
+- The new backend is Java/Spring Boot.
+- MongoDB is the primary database.
+- React + TypeScript is the frontend.
+- The AI provider is behind an application-owned inference boundary.
+- Ten module boundaries are fixed for the initial implementation plan.
+- Future-module functionality must not be implemented early.
+- Breaking contract changes require explicit architectural change and regression verification.
 
-## Next Step
+## Checkpoints
 
-Finalize EcoSort 2.0 functional scope, architecture, and module sequence before implementing Module 1.
+No implementation checkpoints yet.
+
+## Known Issues / Blockers
+
+None currently.
+
+## Next Action
+
+Create/verify the complete module skeleton, then begin M1 only after the repository foundation is clean and the old prototype files have been removed as intended.
