@@ -41,7 +41,7 @@ M1 and M2 are verified and passing. M3 has not been started.
 - Identity propagation: `UserPrincipal` in `SecurityContextHolder`
 - Persistence: `InMemoryUserRepository` behind `UserRepository` interface (M3 boundary)
 - API: `POST /api/auth/register`, `POST /api/auth/login`, `GET /api/auth/me`
-- Test profile disables `SecurityAutoConfiguration` to preserve M1 test compatibility
+- Full Spring Security is active during all tests; M1 tests authenticate via `@WithMockUser` where needed
 
 ## Checkpoints
 

@@ -68,6 +68,11 @@
             <artifactId>spring-boot-testcontainers</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -85,7 +90,6 @@
                 <configuration>
                     <systemPropertyVariables>
                         <spring.profiles.active>test</spring.profiles.active>
-                        <spring.autoconfigure.exclude>org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration</spring.autoconfigure.exclude>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>
