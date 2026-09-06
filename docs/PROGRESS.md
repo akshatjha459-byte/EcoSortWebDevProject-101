@@ -17,7 +17,7 @@
 - AI: isolated behind a stable inference boundary.
 - Final module sequence has been accepted.
 - All ten module directories are established up front with module READMEs and test placeholders.
-- Implementation has not started.
+- M1 Backend Foundation implementation and verification are complete.
 - Accepted scope now includes a user-facing handoff to the official Swachhata platform for sanitation/waste complaints. EcoSort will not collect location or submit complaints directly for this feature.
 
 ## Canonical Project Documents
@@ -94,4 +94,4 @@ None currently.
 
 ## Next Action
 
-Clone the updated repository locally, then begin M1 only after confirming the repository foundation is clean. M9 will later implement the user-facing Swachhata handoff according to the accepted contract.
+Begin M2 Identity & Access after confirming the repository foundation is clean. M9 will later implement the user-facing Swachhata handoff according to the accepted contract.
