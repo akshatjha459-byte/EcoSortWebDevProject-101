@@ -70,5 +70,20 @@ Later modules must use the established project conventions.
 ## Verification Procedure
 Run focused M1 tests, then the full backend regression suite, then inspect the diff.
 
+## Implementation Notes
+- Maven/Spring Boot 3.3.4 backend bootstrapped under `backend/`.
+- Java 17 target, package root `com.ecosort`.
+- Application entry point: `com.ecosort.EcosortApplication`.
+- Configuration conventions: `application.yml` (base), `application-dev.yml` (dev), `application-test.yml` (test).
+- `AppProperties` binds `app.name` and `app.version` with safe defaults.
+- Health baseline: Spring Boot Actuator `health` and `info` endpoints exposed; custom `StartupHealthIndicator` reports `UP`.
+- Common error foundation: `GlobalExceptionHandler` standardizes `ErrorResponse` JSON for `IllegalArgumentException` and generic exceptions.
+- Tests: 6 passing tests covering startup, configuration binding, health endpoint, and exception handling.
+
+## Verification Procedure
+1. Focused M1 tests: `mvn test -Dtest="EcosortApplicationTests,HealthEndpointTest,GlobalExceptionHandlerTest,AppPropertiesTest,StartupHealthIndicatorTest"`
+2. Full backend regression: `mvn test`
+3. Build/package: `mvn clean package -DskipTests`
+
 ## Completion Status
-NOT STARTED
+VERIFIED

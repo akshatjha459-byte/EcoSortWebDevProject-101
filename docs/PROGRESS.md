@@ -4,9 +4,9 @@
 
 ## Project Status
 
-**Phase:** Repository Foundation / Module Skeleton
+**Phase:** M1 Backend Foundation Implementation
 
-**Overall Status:** NOT STARTED
+**Overall Status:** M1 COMPLETED
 
 ## Current State
 
@@ -32,7 +32,7 @@ The personal workflow document is intentionally **not stored in the repository**
 
 | Module | Name | Status |
 |---|---|---|
-| M1 | Backend Foundation | NOT STARTED |
+| M1 | Backend Foundation | VERIFIED |
 | M2 | Identity & Access | NOT STARTED |
 | M3 | Waste Domain & Persistence | NOT STARTED |
 | M4 | Classification Application | NOT STARTED |
@@ -86,7 +86,7 @@ A module is `VERIFIED` only when:
 
 ## Checkpoints
 
-No implementation checkpoints yet.
+- M1 Backend Foundation checkpointed and verified on 2026-09-06. Focused tests (6/6 passed), full regression (6/6 passed), and `mvn clean package` succeeded. No secrets committed. `backend/` directory contains the runnable Spring Boot application.
 
 ## Known Issues / Blockers
 
