@@ -130,6 +130,19 @@ Owns the React + TypeScript UI and integration with the verified backend APIs.
 
 The frontend must not connect directly to MongoDB.
 
+### Swachhata civic-reporting handoff
+
+M9 also owns the user-facing handoff to the official Swachhata platform for sanitation and waste-management complaints.
+
+Contract:
+- EcoSort presents a clear action such as `Report on Swachhata` when appropriate.
+- The action opens the official Swachhata platform; EcoSort does not submit the complaint itself.
+- EcoSort does not request or store user location for this feature.
+- EcoSort does not send EcoSort account data, classification history, or complaint details automatically to Swachhata.
+- EcoSort does not store or track the external complaint lifecycle.
+- Swachhata remains responsible for citizen complaint submission, municipal routing, and complaint status.
+- A direct government API integration is explicitly out of scope unless a later architectural decision approves it.
+
 ## M10 — Production Readiness
 
 **Status:** ACCEPTED
