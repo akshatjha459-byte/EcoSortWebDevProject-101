@@ -18,6 +18,7 @@
 - Final module sequence has been accepted.
 - All ten module directories are established up front with module READMEs and test placeholders.
 - Implementation has not started.
+- Accepted scope now includes a user-facing handoff to the official Swachhata platform for sanitation/waste complaints. EcoSort will not collect location or submit complaints directly for this feature.
 
 ## Canonical Project Documents
 
@@ -79,6 +80,9 @@ A module is `VERIFIED` only when:
 - Ten module boundaries are fixed for the initial implementation plan.
 - Future-module functionality must not be implemented early.
 - Breaking contract changes require explicit architectural change and regression verification.
+- Swachhata is an external civic-reporting destination, not an EcoSort complaint backend.
+- EcoSort does not request or store location solely for the Swachhata handoff.
+- EcoSort does not directly submit, synchronize, or track Swachhata complaints.
 
 ## Checkpoints
 
@@ -90,4 +94,4 @@ None currently.
 
 ## Next Action
 
-Create/verify the complete module skeleton, then begin M1 only after the repository foundation is clean and the old prototype files have been removed as intended.
+Clone the updated repository locally, then begin M1 only after confirming the repository foundation is clean. M9 will later implement the user-facing Swachhata handoff according to the accepted contract.
