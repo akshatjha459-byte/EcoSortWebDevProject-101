@@ -108,7 +108,7 @@ The initial system scope is:
 7. Reports and dashboard analytics based on stored activity.
 8. Responsive web UI integrating the complete flow.
 9. A civic-reporting handoff that lets users open the official Swachhata platform for sanitation/waste complaints without EcoSort collecting location or directly submitting the complaint.
-10. Production-oriented configuration, security, testing, and deployment readiness.
+10. Production-oriented configuration, security, testing, and release readiness.
 
 Features outside this scope are not to be added speculatively.
 
@@ -127,7 +127,7 @@ The project is divided into ten modules. The repository contains the complete mo
 | M7 | History & Reports | User history, filtering, report-oriented APIs and aggregation |
 | M8 | Dashboard & Analytics | Metrics and dashboard data derived from verified application data |
 | M9 | Web Application Integration | React UI, authentication flow, identification flow, history, reports, dashboard, and civic-reporting handoff |
-| M10 | Production Readiness | End-to-end verification, security hardening, configuration, deployment, observability, final regression |
+| M10 | Production Readiness | End-to-end verification, security hardening, configuration, observability, final regression, and reproducible local release readiness |
 
 Later modules may consume earlier modules, but may not silently redefine their verified contracts.
 
@@ -204,6 +204,8 @@ Persistence access is isolated through repository abstractions. Domain/applicati
 The exact document schema and indexes are finalized in the relevant module contract before implementation.
 
 Tests must not accidentally write to a production database or depend on developer-specific credentials.
+
+For local/self-hosted use, MongoDB configuration is externalized so each installation can provide its own MongoDB or MongoDB Atlas resources. A shared project database is not a required runtime dependency.
 
 ## 10. API Contract
 
@@ -307,6 +309,12 @@ Status: Accepted.
 
 EcoSort will provide a user-facing handoff to the official Swachhata platform for sanitation and waste-management complaints. EcoSort will not directly integrate complaint submission, collect the user's location for this purpose, or store external complaint data. The user completes the complaint on Swachhata, which owns the municipal routing and complaint lifecycle.
 
+### ADR-007 — Local/self-hosted runtime
+
+Status: Accepted.
+
+EcoSort is designed to be runnable from a fresh GitHub clone using locally supplied or user-owned external resources. Public deployment is not required for the core project or portfolio demonstration. Users may run the frontend, backend, MongoDB, and AI integration using their own resources and configuration. A public deployment may be added later without changing the core module contracts.
+
 ## 15. Constraints
 
 - Do not implement future modules early.
@@ -317,6 +325,8 @@ EcoSort will provide a user-facing handoff to the official Swachhata platform fo
 - Do not weaken or delete existing tests to make a module pass.
 - Do not report a module as verified until its required checks pass.
 - Do not turn the Swachhata handoff into a government API integration unless a separate architectural decision explicitly approves it.
+- Do not make a shared project-owned MongoDB instance a required runtime dependency for users cloning the repository.
+- Public deployment is optional and must not become a hidden acceptance criterion for module completion.
 
 ## 16. Open Decisions
 
@@ -327,7 +337,7 @@ The following implementation-level decisions are intentionally resolved when the
 - Final MongoDB document fields and indexes
 - Exact REST endpoint paths and DTOs
 - Final frontend state-management details
-- Deployment platform and production topology
 - Observability implementation details
+- Optional public deployment platform and topology, if deployment is later desired
 
 These decisions must not be invented silently by an implementation AI. They must be recorded when accepted.
