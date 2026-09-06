@@ -12,12 +12,13 @@ Build the React + TypeScript web application and integrate the verified backend 
 - Dashboard UI
 - Loading, validation, and error states
 - Backend API client integration
+- Civic-reporting handoff to the official Swachhata platform
 
 ## Responsibilities
-Own frontend presentation, client-side orchestration, and API integration.
+Own frontend presentation, client-side orchestration, API integration, and the user-facing handoff to Swachhata for sanitation/waste complaints.
 
 ## Non-Responsibilities
-MongoDB access, backend business rules, AI provider calls, or authentication bypasses.
+MongoDB access, backend business rules, AI provider calls, authentication bypasses, direct Swachhata complaint submission, location collection for the Swachhata handoff, or storage of external complaint data.
 
 ## Dependencies
 M1–M8 and all verified backend API contracts required by the UI.
@@ -29,10 +30,10 @@ User interaction and backend API responses.
 Responsive web application behavior and user-facing states.
 
 ## Interfaces / Contracts
-Consumes the accepted backend REST contracts without silently redefining them.
+Consumes the accepted backend REST contracts without silently redefining them. The civic-reporting feature opens the official Swachhata platform; it does not create a new government API contract.
 
 ## Data Model
-Frontend types mirror API DTOs as needed; frontend state is not treated as authoritative persistence.
+Frontend types mirror API DTOs as needed; frontend state is not treated as authoritative persistence. Swachhata complaint data is not persisted by EcoSort.
 
 ## Files Owned
 Frontend application and M9-focused tests.
@@ -49,22 +50,25 @@ Backend business logic merely to accommodate UI convenience without contract rev
 - Classification and recommendations render real backend results.
 - History/reports/dashboard consume real data.
 - Error/loading/empty states are handled.
+- A clear civic-reporting action opens the official Swachhata platform.
+- The civic-reporting handoff does not request or store user location.
+- EcoSort does not attempt to submit or track a Swachhata complaint.
 - Earlier backend regression remains green.
 
 ## Tests
-Component/API integration tests and appropriate end-to-end coverage for critical flows.
+Component/API integration tests and appropriate end-to-end coverage for critical flows, including verification that the civic-reporting action uses the intended external destination and does not introduce location permissions or backend complaint persistence.
 
 ## Failure / Edge Cases
-Network failure, expired session, invalid upload/input, empty history, backend errors, slow AI response.
+Network failure, expired session, invalid upload/input, empty history, backend errors, slow AI response, unavailable external Swachhata site, blocked external navigation.
 
 ## Security Considerations
-No secrets in frontend source. Do not trust client-side authorization. Do not expose database/provider credentials.
+No secrets in frontend source. Do not trust client-side authorization. Do not expose database/provider credentials. Treat the external Swachhata destination as an external service and do not send EcoSort user data to it automatically.
 
 ## Integration Requirements
-The frontend must use the backend as the source of truth for protected business operations.
+The frontend must use the backend as the source of truth for protected business operations. Swachhata remains the system of record for any complaint the user chooses to submit there.
 
 ## Verification Procedure
-Focused frontend tests → backend regression → end-to-end verification → diff/security review → docs → checkpoint.
+Focused frontend tests → backend regression → end-to-end verification → external-link/security review → docs → checkpoint.
 
 ## Completion Status
 NOT STARTED
