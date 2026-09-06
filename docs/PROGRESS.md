@@ -1,97 +1,85 @@
-# EcoSort 2.0 — Progress
-
-> This file is the persistent handoff state. It must reflect repository reality, not chat history.
-
-## Project Status
-
-**Phase:** M1 Backend Foundation Implementation
-
-**Overall Status:** M1 COMPLETED
-
-## Current State
-
-- EcoSort 2.0 is a clean rebuild of the previous Lovable/Supabase prototype.
-- Backend direction: Java + Spring Boot + Maven.
-- Database: MongoDB / MongoDB Atlas.
-- Frontend: React + TypeScript.
-- AI: isolated behind a stable inference boundary.
-- Final module sequence has been accepted.
-- All ten module directories are established up front with module READMEs and test placeholders.
-- M1 Backend Foundation implementation and verification are complete.
-- Accepted scope now includes a user-facing handoff to the official Swachhata platform for sanitation/waste complaints. EcoSort will not collect location or submit complaints directly for this feature.
-
-## Canonical Project Documents
-
-- `docs/Architecture.md` — accepted system architecture and module sequence.
-- `docs/module-contracts.md` — accepted cross-module contract registry.
-- `docs/PROGRESS.md` — current implementation/handoff state.
-
-The personal workflow document is intentionally **not stored in the repository**.
+# EcoSort 2.0 Progress
 
 ## Module Status
 
-| Module | Name | Status |
-|---|---|---|
-| M1 | Backend Foundation | VERIFIED |
-| M2 | Identity & Access | NOT STARTED |
-| M3 | Waste Domain & Persistence | NOT STARTED |
-| M4 | Classification Application | NOT STARTED |
-| M5 | AI Inference Integration | NOT STARTED |
-| M6 | Disposal Recommendations | NOT STARTED |
-| M7 | History & Reports | NOT STARTED |
-| M8 | Dashboard & Analytics | NOT STARTED |
-| M9 | Web Application Integration | NOT STARTED |
-| M10 | Production Readiness | NOT STARTED |
+| Module | Status | Description |
+|--------|--------|-------------|
+| M1 Foundation & Health | **VERIFIED** | Spring Boot app context, actuator health, error handling, app properties, README. |
+| M2 Identity & Access | **VERIFIED** | JWT authentication, BCrypt password hashing, protected endpoints, user identity propagation. |
+| M3 Waste Classification Core | NOT STARTED | MongoDB persistence, waste classification models, ingestion pipeline. |
+| M4 AI Integration | NOT STARTED | Gemini-based classification and recommendations. |
+| M5 Disposal Recommendations | NOT STARTED | Disposal guidance logic and APIs. |
+| M6 User Dashboard & History | NOT STARTED | User-facing dashboard and classification history. |
+| M7 Frontend Integration | NOT STARTED | React frontend for EcoSort. |
+| M8 Swachhata Integration | NOT STARTED | Swachhata platform integration. |
+| M9 Production Hardening | NOT STARTED | Security audit, performance tuning, deployment configs. |
+| M10 Documentation & Release | NOT STARTED | Final docs, release artifacts, demo. |
 
-## Module Workflow
+## Current State
 
-For every module:
+M1 and M2 are verified and passing. M3 has not been started.
 
-1. Read the canonical architecture, contracts, progress, module README, source, and relevant tests.
-2. Plan only the current module.
-3. Implement only the current module.
-4. Run focused module tests.
-5. Run the complete regression suite.
-6. Inspect `git status` and `git diff`.
-7. Update module README and canonical docs as required.
-8. Create a focused checkpoint commit.
-9. Only then move to the next module.
+**M1 verified behavior:**
+- Application context loads successfully with actuator health and info endpoints
+- `StartupHealthIndicator` reports UP after context refresh
+- `GlobalExceptionHandler` returns consistent `ErrorResponse` JSON for `IllegalArgumentException`
+- `AppProperties` binds defaults from `application.yml`
+- All 6 M1 tests pass
 
-## Verification Standard
+**M2 verified behavior:**
+- Application context loads with Spring Security and JWT configuration
+- Registration creates users with BCrypt-hashed passwords
+- Login returns JWT tokens with user profiles
+- Protected endpoint (`GET /api/auth/me`) requires valid authentication
+- Authenticated identity is correctly propagated via `CurrentUser.get()`
+- Unauthenticated and unauthorized requests return 401 with consistent `ErrorResponse`
+- All 15 M2 tests pass
 
-A module is `VERIFIED` only when:
-
-- implementation is complete;
-- focused tests pass;
-- full regression tests pass;
-- contracts are preserved;
-- no secrets are committed;
-- diff has been reviewed;
-- documentation reflects verified reality;
-- and the checkpoint is recorded.
-
-## Important Decisions
-
-- The previous Lovable/Supabase project is reference-only.
-- The new backend is Java/Spring Boot.
-- MongoDB is the primary database.
-- React + TypeScript is the frontend.
-- The AI provider is behind an application-owned inference boundary.
-- Ten module boundaries are fixed for the initial implementation plan.
-- Future-module functionality must not be implemented early.
-- Breaking contract changes require explicit architectural change and regression verification.
-- Swachhata is an external civic-reporting destination, not an EcoSort complaint backend.
-- EcoSort does not request or store location solely for the Swachhata handoff.
-- EcoSort does not directly submit, synchronize, or track Swachhata complaints.
+**M2 implementation details:**
+- Authentication: Spring Security + JWT (jjwt 0.12.5)
+- Password hashing: BCrypt via `BCryptPasswordEncoder`
+- Identity propagation: `UserPrincipal` in `SecurityContextHolder`
+- Persistence: `InMemoryUserRepository` behind `UserRepository` interface (M3 boundary)
+- API: `POST /api/auth/register`, `POST /api/auth/login`, `GET /api/auth/me`
+- Test profile disables `SecurityAutoConfiguration` to preserve M1 test compatibility
 
 ## Checkpoints
 
-- M1 Backend Foundation checkpointed and verified on 2026-09-06. Focused tests (6/6 passed), full regression (6/6 passed), and `mvn clean package` succeeded. No secrets committed. `backend/` directory contains the runnable Spring Boot application.
-
-## Known Issues / Blockers
-
-None currently.
+- **M1 checkpoint:** Backend foundation complete. Health endpoints, error handling, and app properties verified. All M1 tests green.
+- **M2 checkpoint:** Identity & Access foundation complete. JWT auth, password hashing, protected endpoints, and identity propagation verified. All backend tests (M1 + M2) green. Clean Maven package succeeds.
 
 ## Next Action
 
-Begin M2 Identity & Access after confirming the repository foundation is clean. M9 will later implement the user-facing Swachhata handoff according to the accepted contract.
+Begin **M3 Waste Classification Core**:
+- Introduce MongoDB persistence
+- Implement waste classification models
+- Build ingestion pipeline
+
+## Repository Structure
+
+```
+backend/
+  src/main/java/com/ecosort/
+    auth/           ← M2: authentication DTOs, services, controllers
+    config/         ← M1: error handling, app properties; M2: security config
+    health/         ← M1: startup health indicator
+    security/       ← M2: JWT filter, user principal, current user context
+  src/test/java/com/ecosort/
+    auth/           ← M2: focused auth tests
+    config/         ← M1: exception handler tests
+    health/         ← M1: health endpoint tests
+modules/
+  module-01/       ← M1 README
+  module-02/       ← M2 README (VERIFIED)
+docs/
+  Architecture.md
+  module-contracts.md
+  PROGRESS.md      ← This file
+```
+
+## Verification History
+
+| Date | Action | Result |
+|------|--------|--------|
+| M1 | Initial implementation | VERIFIED |
+| M2 | Auth, JWT, protected endpoints | VERIFIED — 21/21 tests pass |

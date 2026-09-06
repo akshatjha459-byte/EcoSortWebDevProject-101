@@ -1,6 +1,15 @@
 spring:
+  config:
+    activate:
+      on-profile: test
   main:
     web-application-environment: servlet
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
+
+app:
+  jwt:
+    secret: test-secret-for-unit-tests-only-1234567890
 
 management:
   endpoints:

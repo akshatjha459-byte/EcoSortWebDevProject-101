@@ -1,6 +1,9 @@
 app:
   name: EcoSort
   version: 0.1.0
+  jwt:
+    secret: ${APP_JWT_SECRET:change-me-in-production-12345678901234567890}
+    expiration-ms: ${APP_JWT_EXPIRATION_MS:86400000}
 
 server:
   port: 8080
