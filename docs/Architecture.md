@@ -107,7 +107,8 @@ The initial system scope is:
 6. Persistent user waste history.
 7. Reports and dashboard analytics based on stored activity.
 8. Responsive web UI integrating the complete flow.
-9. Production-oriented configuration, security, testing, and deployment readiness.
+9. A civic-reporting handoff that lets users open the official Swachhata platform for sanitation/waste complaints without EcoSort collecting location or directly submitting the complaint.
+10. Production-oriented configuration, security, testing, and deployment readiness.
 
 Features outside this scope are not to be added speculatively.
 
@@ -125,7 +126,7 @@ The project is divided into ten modules. The repository contains the complete mo
 | M6 | Disposal Recommendations | Disposal/recycling rules and recommendation service tied to classifications |
 | M7 | History & Reports | User history, filtering, report-oriented APIs and aggregation |
 | M8 | Dashboard & Analytics | Metrics and dashboard data derived from verified application data |
-| M9 | Web Application Integration | React UI, authentication flow, identification flow, history, reports, dashboard |
+| M9 | Web Application Integration | React UI, authentication flow, identification flow, history, reports, dashboard, and civic-reporting handoff |
 | M10 | Production Readiness | End-to-end verification, security hardening, configuration, deployment, observability, final regression |
 
 Later modules may consume earlier modules, but may not silently redefine their verified contracts.
@@ -159,6 +160,22 @@ API response
         ↓
 Frontend result display
 ```
+
+Civic-reporting flow:
+
+```text
+User identifies a sanitation/waste issue
+        ↓
+EcoSort provides context/instructions
+        ↓
+User selects "Report on Swachhata"
+        ↓
+External official Swachhata platform
+        ↓
+User completes the complaint there
+```
+
+EcoSort does not collect the user's location for this handoff, does not submit the complaint on the user's behalf, and does not store Swachhata complaint data. The external platform owns complaint routing and status handling.
 
 History and analytics consume persisted records rather than calling the AI provider again.
 
@@ -211,6 +228,7 @@ API rules:
 - Uploaded/input data is validated.
 - External AI/API responses are treated as untrusted input.
 - Production configuration must not rely on committed secrets.
+- EcoSort must not request or store location data solely to redirect a user to Swachhata.
 
 ## 12. Testing Architecture
 
@@ -283,6 +301,12 @@ Status: Accepted.
 
 All ten module skeletons are established up front. Implementation proceeds one module at a time with a module README, focused tests, regression testing, diff review, documentation update, and checkpoint before moving forward.
 
+### ADR-006 — Swachhata civic-reporting handoff
+
+Status: Accepted.
+
+EcoSort will provide a user-facing handoff to the official Swachhata platform for sanitation and waste-management complaints. EcoSort will not directly integrate complaint submission, collect the user's location for this purpose, or store external complaint data. The user completes the complaint on Swachhata, which owns the municipal routing and complaint lifecycle.
+
 ## 15. Constraints
 
 - Do not implement future modules early.
@@ -292,6 +316,7 @@ All ten module skeletons are established up front. Implementation proceeds one m
 - Do not commit secrets.
 - Do not weaken or delete existing tests to make a module pass.
 - Do not report a module as verified until its required checks pass.
+- Do not turn the Swachhata handoff into a government API integration unless a separate architectural decision explicitly approves it.
 
 ## 16. Open Decisions
 
