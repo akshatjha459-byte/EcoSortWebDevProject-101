@@ -18,11 +18,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Import(StartupHealthIndicator.class)
 class StartupHealthIndicatorTest {
 
+    private static final Instant FIXED_INSTANT = Instant.parse("2024-01-01T00:00:00Z");
+
     @TestConfiguration
     static class FixedClockConfig {
         @Bean
         Clock clock() {
-            return Clock.fixed(Instant.parse("2024-01-01T00:00:00Z"), ZoneId.of("UTC"));
+            return Clock.fixed(FIXED_INSTANT, ZoneId.of("UTC"));
         }
     }
 
@@ -34,6 +36,6 @@ class StartupHealthIndicatorTest {
         Health health = healthIndicator.health();
         assertThat(health.getStatus().getCode()).isEqualTo("UP");
         assertThat(health.getDetails()).containsEntry("app", "EcoSort");
-        assertThat(health.getDetails()).containsKey("timestamp");
+        assertThat(health.getDetails()).containsEntry("timestamp", FIXED_INSTANT.toString());
     }
 }
