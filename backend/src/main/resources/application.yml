@@ -11,6 +11,9 @@ server:
 spring:
   application:
     name: ${APP_NAME:ecosort-api}
+  data:
+    mongodb:
+      uri: ${MONGODB_URI}
 
 management:
   endpoints:

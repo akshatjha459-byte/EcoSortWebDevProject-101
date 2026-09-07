@@ -4,6 +4,9 @@ spring:
       on-profile: test
   main:
     web-application-environment: servlet
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/ecosort_test
 
 app:
   jwt:
@@ -17,3 +20,6 @@ management:
   endpoint:
     health:
       show-details: always
+  health:
+    mongo:
+      enabled: false

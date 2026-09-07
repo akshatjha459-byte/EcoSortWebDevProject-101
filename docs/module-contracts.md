@@ -68,13 +68,70 @@ Owns user identity, authentication, authorization, protected-resource rules, and
 
 ## M3 — Waste Domain & Persistence
 
-**Status:** ACCEPTED
+**Status:** VERIFIED
 
 Owns the core waste/classification persistence model and MongoDB repository boundary.
 
 **Cross-module contract:** downstream modules consume domain/application models and repository/service interfaces rather than raw MongoDB queries.
 
-The exact document fields, identifiers, indexes, validation rules, and repository methods are recorded here when finalized during M3.
+### Domain Model
+
+**WasteStatus** — enum: `PENDING`, `CLASSIFIED`, `FAILED`
+
+**WasteRecord** (immutable domain record):
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `id` | `String` (UUID) | Yes (generated) | Unique record identifier |
+| `userId` | `String` | Yes | Owning user ID from authenticated context |
+| `inputRef` | `String` | Yes | Reference to the uploaded waste input/image |
+| `predictedCategory` | `String` | No (when status=CLASSIFIED) | AI-predicted waste category |
+| `confidence` | `Double` | No | AI confidence score 0.0–1.0 |
+| `status` | `WasteStatus` | Yes | Current classification state |
+| `createdAt` | `Instant` (UTC) | Yes | Record creation timestamp |
+| `errorMessage` | `String` | No (when status=FAILED) | Error details for failed classifications |
+
+### MongoDB Document
+
+**Collection:** `waste_records`
+
+Document fields mirror the domain `WasteRecord`. `WasteStatus` is stored as its enum name string.
+
+### Indexes
+
+| Name | Keys | Justification |
+|---|---|---|
+| `user_created_idx` | `{userId: 1, createdAt: -1}` | User history queries (M7) |
+| `user_status_idx` | `{userId: 1, status: 1}` | Filtered queries by status |
+
+### Validation Rules
+
+- `userId` must not be null or blank
+- `inputRef` must not be null or blank
+- `status` must not be null
+- `createdAt` must not be null
+- `confidence` if present must be between 0.0 and 1.0
+- `predictedCategory` required when `status == CLASSIFIED`
+
+### Repository Methods
+
+`WasteRepository` (domain interface):
+- `WasteRecord save(WasteRecord record)` — persists and returns the saved record
+- `WasteRecord findById(String id)` — returns null if not found
+- `List<WasteRecord> findByUserId(String userId)` — records ordered by `createdAt` descending
+- `List<WasteRecord> findByUserIdAndStatus(String userId, WasteStatus status)` — filtered by status, ordered by `createdAt` descending
+
+### Persistence Failure Handling
+
+- Save failures are wrapped in `IllegalStateException` with message "Failed to persist waste record"
+- Missing records return `null` (not an exception) from `findById`
+
+### Design Decisions
+
+1. **`inputRef` is a reference, not binary image data.** The actual image is stored elsewhere (e.g., object storage); only a reference string is persisted. This keeps documents small and follows the principle of not storing binary blobs in MongoDB.
+2. **`WasteStatus` is stored as a string** in MongoDB rather than an ordinal integer, for readability and backward compatibility.
+3. **Timestamps use `Instant`** (UTC) consistent with the M2 `User` model convention.
+4. **`findById` returns null** for missing records, matching the existing `UserRepository.findById` convention in M2.
+5. **No AI-provider-specific fields** are included; only generic classification result fields that M4 will populate.
 
 ## M4 — Classification Application
 

@@ -6,7 +6,7 @@
 |--------|--------|-------------|
 | M1 Foundation & Health | **VERIFIED** | Spring Boot app context, actuator health, error handling, app properties, README. |
 | M2 Identity & Access | **VERIFIED** | JWT authentication, BCrypt password hashing, protected endpoints, user identity propagation. |
-| M3 Waste Classification Core | NOT STARTED | MongoDB persistence, waste classification models, ingestion pipeline. |
+| M3 Waste Domain & Persistence | **VERIFIED** | MongoDB waste records, domain/persistence separation, repository boundary, indexes. |
 | M4 AI Integration | NOT STARTED | Gemini-based classification and recommendations. |
 | M5 Disposal Recommendations | NOT STARTED | Disposal guidance logic and APIs. |
 | M6 User Dashboard & History | NOT STARTED | User-facing dashboard and classification history. |
@@ -17,7 +17,7 @@
 
 ## Current State
 
-M1 and M2 are verified and passing. M3 has not been started.
+M1, M2, and M3 are verified and passing.
 
 **M1 verified behavior:**
 - Application context loads successfully with actuator health and info endpoints
@@ -43,17 +43,38 @@ M1 and M2 are verified and passing. M3 has not been started.
 - API: `POST /api/auth/register`, `POST /api/auth/login`, `GET /api/auth/me`
 - Full Spring Security is active during all tests; M1 tests authenticate via `@WithMockUser` where needed
 
+**M3 verified behavior:**
+- Application context loads with MongoDB persistence configured
+- `WasteRecord` domain model enforces required fields (userId, inputRef, status, createdAt) and confidence bounds (0–1)
+- `WasteRecord.create()` generates a UUID id, sets status to PENDING, and records creation timestamp
+- `WasteRecord.withClassification()` transitions to CLASSIFIED with predicted category and confidence
+- `WasteRecord.withError()` transitions to FAILED with error message
+- `WasteDocument` maps to/from `WasteRecord` via `WasteDocumentMapper` with no MongoDB dependencies in the domain layer
+- `MongoWasteRepository` implements `WasteRepository` interface behind Spring Data MongoDB, mapping domain objects to/from documents
+- `MongoWasteRepository.save()` wraps persistence failures in `IllegalStateException`
+- `MongoWasteRepository.findById()` returns null for missing records
+- `WasteService` orchestrates submission (pending), classification completion, and failure handling with user ownership
+- `WasteDocument` declares compound indexes: `user_created_idx` (userId + createdAt desc) and `user_status_idx` (userId + status)
+- MongoDB connection via `MONGODB_URI` environment variable with local fallback default
+
+**M3 implementation details:**
+- Persistence: Spring Data MongoDB (`spring-boot-starter-data-mongodb`)
+- Domain: `WasteRecord` (immutable record), `WasteStatus` (enum: PENDING, CLASSIFIED, FAILED)
+- Repository interface: `WasteRepository` (domain), `WasteMongoRepository` (Spring Data)
+- MongoDB document: `WasteDocument` (`@Document(collection = "waste_records")`)
+- Indexes: `{userId: 1, createdAt: -1}` for user history retrieval, `{userId: 1, status: 1}` for status-filtered queries
+- User ownership: waste records are scoped to authenticated user via `CurrentUserId` from security context
+- Test strategy: unit tests with mocked Spring Data repository for repository implementation logic; annotation-based tests for document/index configuration. Embedded MongoDB was not available in this environment; production uses MongoDB Atlas via `MONGODB_URI`.
+
 ## Checkpoints
 
 - **M1 checkpoint:** Backend foundation complete. Health endpoints, error handling, and app properties verified. All M1 tests green.
 - **M2 checkpoint:** Identity & Access foundation complete. JWT auth, password hashing, protected endpoints, and identity propagation verified. All backend tests (M1 + M2) green. Clean Maven package succeeds.
+- **M3 checkpoint:** Waste domain and persistence complete. Domain models, MongoDB document mapping, repository boundary, indexes, and user ownership verified. All backend tests (M1 + M2 + M3) green (43 tests).
 
 ## Next Action
 
-Begin **M3 Waste Classification Core**:
-- Introduce MongoDB persistence
-- Implement waste classification models
-- Build ingestion pipeline
+M4 is NOT STARTED. Ready to begin classification application layer.
 
 ## Repository Structure
 
@@ -64,22 +85,28 @@ backend/
     config/         ← M1: error handling, app properties; M2: security config
     health/         ← M1: startup health indicator
     security/       ← M2: JWT filter, user principal, current user context
-  src/test/java/com/ecosort/
-    auth/           ← M2: focused auth tests
-    config/         ← M1: exception handler tests
-    health/         ← M1: health endpoint tests
-modules/
-  module-01/       ← M1 README
-  module-02/       ← M2 README (VERIFIED)
-docs/
-  Architecture.md
-  module-contracts.md
-  PROGRESS.md      ← This file
-```
+    waste/          ← M3: waste domain, repository, service, persistence
+      model/        ← M3: WasteRecord, WasteStatus
+      repository/   ← M3: WasteRepository interface
+      service/      ← M3: WasteService
+      persistence/  ← M3: MongoWasteRepository, WasteMongoRepository, WasteDocumentMapper
+        document/   ← M3: WasteDocument
+            modules/
+              module-01/       ← M1 README
+                  module-02/       ← M2 README (VERIFIED)
+                  module-03/       ← M3 README (VERIFIED)
+  docs/
+    Architecture.md
+    module-contracts.md
+    PROGRESS.md      ← This file
+  ```
 
 ## Verification History
 
 | Date | Action | Result |
 |------|--------|--------|
-| M1 | Initial implementation | VERIFIED |
-| M2 | Auth, JWT, protected endpoints | VERIFIED — 21/21 tests pass |
+| M1 | Initial implementation | 6/6 tests pass — VERIFIED |
+| M2 | Auth, JWT, protected endpoints | 15/15 tests pass — VERIFIED |
+| M3 | MongoDB waste persistence, domain/repository/service layer | 22/22 tests pass — VERIFIED |
+
+Total backend test suite: 43 tests — ALL PASSING.
